@@ -46,7 +46,11 @@
    void avancer() {
       reconnaitre_lexeme();
    } 
+/* --------------------------------------------------------------------- */
 
+   void avancer_anlys() {
+      analyser_lexem();
+   } 
    /* --------------------------------------------------------------------- */
 
    Lexeme lexeme_courant() {
@@ -258,6 +262,85 @@
          // state = E_INIT;
       }
       fclose(file);
+   }
+   /* --------------------------------------------------------------------- */
+   // Fonction analyse avec lexeme
+   void analyser_fin(char * fichier){
+      // Initialisation pour l'automate
+      demarrer_car(fichier);
+      avancer_anlys();
+      
+      while (! fin_de_sequence()) { 
+        afficher (lexeme_courant()) ;
+        printf("\n") ;
+        avancer_anlys() ;
+      };
+   }
+   /* --------------------------------------------------------------------- */
+   // Fonction analyse avec lexeme
+   void analyser_lexem(){
+      typedef enum {E_INIT, E_SYMB, E_ENTIER, E_ERR, E_FIN} Etat_Automate ;
+      Etat_Automate etat=E_INIT;
+
+      // on commence par lire et ignorer les separateurs
+      while (est_separateur(caractere_courant())) {
+         avancer_car() ;
+      };
+
+      // lexeme_en_cours.chaine[0] = '\0' ;
+
+      while(etat != E_FIN){
+         switch (etat){
+            case E_INIT:
+               switch (nature_caractere(caractere_courant())){
+               // case C_FIN_SEQUENCE:
+               //    lexeme_en_cours.nature = FIN_SEQUENCE;
+               //    etat = E_FIN;
+               //    break;
+               
+               case CHIFFRE:
+                  lexeme_en_cours.nature = ENTIER;
+                  lexeme_en_cours.ligne = numero_ligne();
+                  lexeme_en_cours.colonne = numero_colonne();
+                  // ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                  lexeme_en_cours.valeur = caractere_courant() - '0';
+                  etat = E_ENTIER;
+                  avancer_car();
+      
+               default:
+                  etat = E_ERR;
+                  break;
+               };
+               break;   
+         
+            case E_ENTIER:
+               switch (nature_caractere(caractere_courant())){
+                  case CHIFFRE:
+                     // ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     lexeme_en_cours.valeur = (lexeme_en_cours.valeur * 10) + (caractere_courant() - '0');
+                     etat = E_ENTIER;
+                     avancer_car();
+                     break;
+                  
+                  case SYMBOLE:
+                     lexeme_en_cours.nature = SYMBOLE;
+                     lexeme_en_cours.valeur = 0;
+                     etat = E_SYMB;
+                     avancer_car();
+                     break;
+
+                  case C_FIN_SEQUENCE:
+                     lexeme_en_cours.nature = FIN_SEQUENCE;
+                     etat = E_FIN;
+                     break;
+
+                  default:
+                     lexeme_en_cours.nature = ERREUR_CAR;
+                     etat = E_ERR;
+
+               }
+         }      
+      }
    }
    /* --------------------------------------------------------------------- */
    // vaut vrai ssi c designe un caractere separateur

@@ -10,9 +10,9 @@
 ------------------------------------------------------------------------ */
 
    typedef enum {
-	  ERREUR_CAR,   // caractere incorrect
-	  CHIFFRE,			// chiffre 
-	  SYMBOLE,			// symbole,
+	   ERREUR_CAR,   // caractere incorrect
+	   CHIFFRE,			// chiffre 
+	   SYMBOLE,			// symbole,
       C_FIN_SEQUENCE   // caractere de fin de sequence     
    } Nature_Caractere ;
 
@@ -23,7 +23,7 @@
       MUL,
       DIV,              // *
       FIN_SEQUENCE,     // pseudo lexeme ajoute en fin de sequence
-    } Nature_Lexeme ;
+   } Nature_Lexeme ;
 
 
    typedef struct { 
@@ -45,8 +45,12 @@
    //        lexeme de la sequence
    //        l'exception Erreur_Lexicale est levee en cas d'erreur
 
-   void analyser(char *fichier);
+   void analyser(char *fichier); // Fonction analyse sans lexeme
    
+   void analyser_fin(char * fichier); // Fonction initialisation de analyser
+
+   void analyser_lexem(); // Fonction analyse avec lexeme
+
    void avancer();
    // pre-condition : la machine sequentielle est demarree
    // e.i. : on pose i = rang du lexeme_courant :

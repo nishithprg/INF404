@@ -28,8 +28,8 @@
       if (strlen(nom_fichier) == 0) {
          File = stdin ;
       } else {
-	 File = fopen(nom_fichier, "r") ;
-      } ;
+	      File = fopen(nom_fichier, "r") ;
+      };
       LigneCour = 1 ; ColonneCour = 0 ;
       avancer_car () ;
    } 
@@ -38,16 +38,16 @@
 
    void avancer_car() {
       if (!feof(File)) { 
-	CarCour = fgetc(File) ;
-	if (CarCour != '\n') {  
-		ColonneCour = ColonneCour + 1 ;
-	} else { 
-		ColonneCour = 1 ;
-		LigneCour = LigneCour + 1 ;
-	} ;
+	      CarCour = fgetc(File) ;
+	      if (CarCour != '\n') {  
+		      ColonneCour = ColonneCour + 1 ;
+	      } else { 
+		      ColonneCour = 1 ;
+		      LigneCour = LigneCour + 1 ;
+	      } ;
       } else { 
-	CarCour = EOF ;
-      } ;
+	      CarCour = EOF ;
+      };
    }
 
    /* --------------------------------------------------------------------- */
