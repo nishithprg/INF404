@@ -304,7 +304,6 @@
                      lexeme_en_cours.ligne = numero_ligne();
                      lexeme_en_cours.colonne = numero_colonne();
                      // ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
-                     // lexeme_en_cours.valeur = caractere_courant() - '0';
                      etat = E_ENTIER;
                      avancer_car();
                      break;
