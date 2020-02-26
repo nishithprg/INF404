@@ -33,6 +33,10 @@
    int est_chiffre(char c ) ;
    int est_symbole(char c ) ;
    void reconnaitre_lexeme();
+   void analyser(char *fichier);
+   void analyser_fin(char * fichier);
+   void analyser_lexem();
+   unsigned int col_prev = 1;
 
    /* --------------------------------------------------------------------- */
 
@@ -102,19 +106,18 @@
 			switch(nature_caractere(caractere_courant())) {
 
 				case C_FIN_SEQUENCE: 
-             		lexeme_en_cours.nature = FIN_SEQUENCE;
-                	etat = E_FIN;
+             	lexeme_en_cours.nature = FIN_SEQUENCE;
+               etat = E_FIN;
 					break ;
-
 
 				case CHIFFRE: 
 		     		lexeme_en_cours.nature = ENTIER;
-                	lexeme_en_cours.ligne = numero_ligne();
-                	lexeme_en_cours.colonne = numero_colonne();
+               lexeme_en_cours.ligne = numero_ligne();
+               lexeme_en_cours.colonne = numero_colonne();
 		     		ajouter_caractere (lexeme_en_cours.chaine, caractere_courant()) ;
-               		lexeme_en_cours.valeur = caractere_courant() - '0';
-               		etat = E_ENTIER;
-		   			avancer_car() ;
+               lexeme_en_cours.valeur = caractere_courant() - '0';
+               etat = E_ENTIER;
+		   		avancer_car() ;
 					break ;
 
 				case SYMBOLE: 
@@ -271,9 +274,9 @@
       avancer_anlys();
       
       while (! fin_de_sequence()) { 
-        afficher (lexeme_courant()) ;
-        printf("\n") ;
-        avancer_anlys() ;
+        // afficher (lexeme_courant()) ;
+         printf("%c ",caractere_courant());
+         avancer_anlys() ;
       };
    }
    /* --------------------------------------------------------------------- */
@@ -282,34 +285,39 @@
       typedef enum {E_INIT, E_SYMB, E_ENTIER, E_ERR, E_FIN} Etat_Automate ;
       Etat_Automate etat=E_INIT;
 
-      // on commence par lire et ignorer les separateurs
-      while (est_separateur(caractere_courant())) {
-         avancer_car() ;
-      };
-
       // lexeme_en_cours.chaine[0] = '\0' ;
 
       while(etat != E_FIN){
+         
+         // on oublie les espaces vide inclus ceux entre des chiffre ex : 12 65 meme chose que 1256
+         while (est_separateur(caractere_courant())) {
+            avancer_car() ;
+         };
+
          switch (etat){
+
             case E_INIT:
-               switch (nature_caractere(caractere_courant())){
-               // case C_FIN_SEQUENCE:
-               //    lexeme_en_cours.nature = FIN_SEQUENCE;
-               //    etat = E_FIN;
-               //    break;
-               
-               case CHIFFRE:
-                  lexeme_en_cours.nature = ENTIER;
-                  lexeme_en_cours.ligne = numero_ligne();
-                  lexeme_en_cours.colonne = numero_colonne();
-                  // ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
-                  lexeme_en_cours.valeur = caractere_courant() - '0';
-                  etat = E_ENTIER;
-                  avancer_car();
-      
-               default:
-                  etat = E_ERR;
-                  break;
+               switch (nature_caractere(caractere_courant())){      
+
+                  case CHIFFRE:
+                     lexeme_en_cours.nature = ENTIER;
+                     lexeme_en_cours.ligne = numero_ligne();
+                     lexeme_en_cours.colonne = numero_colonne();
+                     // ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     // lexeme_en_cours.valeur = caractere_courant() - '0';
+                     etat = E_ENTIER;
+                     avancer_car();
+                     break;
+
+                  case C_FIN_SEQUENCE: 
+                     lexeme_en_cours.nature = FIN_SEQUENCE;
+                     etat = E_FIN;
+                     break ;
+
+                  default:
+                     lexeme_en_cours.nature = ERREUR_CAR;
+                     etat = E_ERR;
+                     break;
                };
                break;   
          
@@ -320,10 +328,26 @@
                      lexeme_en_cours.valeur = (lexeme_en_cours.valeur * 10) + (caractere_courant() - '0');
                      etat = E_ENTIER;
                      avancer_car();
-                     break;
+                     break; 
                   
                   case SYMBOLE:
-                     lexeme_en_cours.nature = SYMBOLE;
+                     switch(caractere_courant()){
+                        case '+':
+                           lexeme_en_cours.nature = PLUS;
+                           break;
+                        case '-':
+                           lexeme_en_cours.nature = MOINS;
+                           break;
+                        case '*':
+                           lexeme_en_cours.nature = MUL;
+                           break;
+                        case '/':
+                           lexeme_en_cours.nature = DIV;
+                           break;
+                        default:
+                           etat = E_ERR;
+                           break;
+                     };
                      lexeme_en_cours.valeur = 0;
                      etat = E_SYMB;
                      avancer_car();
@@ -331,14 +355,34 @@
 
                   case C_FIN_SEQUENCE:
                      lexeme_en_cours.nature = FIN_SEQUENCE;
-                     etat = E_FIN;
+                     lexeme_en_cours.valeur = 0;
                      break;
 
                   default:
-                     lexeme_en_cours.nature = ERREUR_CAR;
                      etat = E_ERR;
-
                }
+
+            case E_SYMB:
+               switch(nature_caractere(caractere_courant())){
+                  case CHIFFRE:
+                     lexeme_en_cours.nature = ENTIER;
+                     etat = E_ENTIER;
+                     break;
+
+                  case C_FIN_SEQUENCE:
+                     lexeme_en_cours.nature = FIN_SEQUENCE;
+                     lexeme_en_cours.valeur = 0;
+                     break;
+
+                  default:
+                     etat = E_ERR;
+                     break;
+               };
+            case E_ERR:
+               break;
+
+            case E_FIN:
+               break;
          }      
       }
    }
