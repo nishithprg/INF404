@@ -10,21 +10,37 @@
 ------------------------------------------------------------------------ */
 
    typedef enum {
-	   ERREUR_CAR,   // caractere incorrect
-	   CHIFFRE,			// chiffre 
-	   SYMBOLE,			// symbole,
-      C_FIN_SEQUENCE   // caractere de fin de sequence     
+	   ERREUR_CAR,       // caractere incorrect
+	   CHIFFRE,			   // chiffre 
+	   SYMBOLE,          
+      LETTRE,           
+      SEPC,
+      AFFC,			      // symbole,
+      C_FIN_SEQUENCE    // caractere de fin de sequence     
    } Nature_Caractere ;
 
    typedef enum { 
       ENTIER,           // sequence de chiffres
+      NOMV,           // sequence d'alphabet
+      SEP,              // ;
+      AFF,              // =
       PLUS,             // +
       MOINS,            // -
-      MUL,
-      DIV,              // *
-      FIN_SEQUENCE,     // pseudo lexeme ajoute en fin de sequence
+      MUL,              // *
+      DIV,              // /
+      FIN_SEQUENCE     // pseudo lexeme ajoute en fin de sequence
    } Nature_Lexeme ;
 
+   typedef enum {
+      E_INIT, 
+      E_AFF, 
+      E_ENTIER, 
+      E_IDF, 
+      E_SYMB, 
+      E_ERR, 
+      E_FIN, 
+      E_FIN_ERR
+   } Etat_Automate;
 
    typedef struct { 
       Nature_Lexeme nature;    // nature du lexeme

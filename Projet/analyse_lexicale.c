@@ -24,14 +24,16 @@
 
 
 /* Les variables et fonctions locales au module */
-
    Lexeme lexeme_en_cours ;	/* le lexeme courant */
 
    void ajouter_caractere (char *s, char c);
    Nature_Caractere nature_caractere (char c);
-   int est_separateur(char c ) ;
-   int est_chiffre(char c ) ;
-   int est_symbole(char c ) ;
+   int est_separateur(char c);
+   int est_chiffre(char c);
+   int est_symbole(char c);
+   int est_lettre(char c);
+   int est_sep(char c);
+   int est_aff(char c);
    void reconnaitre_lexeme();
    void analyser(char *fichier);
    void analyser_fin(char * fichier);
@@ -102,7 +104,7 @@
 	    switch (etat) {
 
 		  case E_INIT: // etat initial
-
+          
 			switch(nature_caractere(caractere_courant())) {
 
 				case C_FIN_SEQUENCE: 
@@ -180,12 +182,11 @@
    // (la chaine s est donc modifiee)
  
    void ajouter_caractere (char *s, char c) {
-	int l ;
-	
-	l = strlen(s) ;
-	s[l] = c ;
-	s[l+1] = '\0' ;
-   } ;
+	   int l;
+	   l = strlen(s) ;
+      s[l] = c;
+      s[l+1] = '\0';
+   };
 
    /* --------------------------------------------------------------------- */
 
@@ -193,7 +194,10 @@
 	   if (fin_de_sequence_car(c)) return C_FIN_SEQUENCE;
 	   if (est_chiffre(c)) return CHIFFRE;
 	   if (est_symbole(c)) return SYMBOLE;
-	   return ERREUR_CAR ;
+      if (est_lettre(c)) return LETTRE;
+      if (est_aff(c)) return AFFC;
+      if (est_sep(c)) return SEPC;
+	   return ERREUR_CAR;
    }
    /* --------------------------------------------------------------------- */
 
@@ -281,49 +285,126 @@
    }
    /* --------------------------------------------------------------------- */
    // Fonction analyse avec lexeme
+   void afficher_etat(Etat_Automate etat){
+      switch(etat){
+         case E_INIT: 
+            printf("E_INIT");
+            break;
+         case E_AFF:
+            printf("E_AFF");
+            break; 
+         case E_ENTIER: 
+            printf("E_ENTIER");
+            break;
+         case E_IDF:
+            printf("E_IDF");
+            break;
+         case E_SYMB: 
+            printf("E_SYMB");
+            break;
+         case E_ERR: 
+            printf("E_ERR");
+            break;
+         case E_FIN: 
+            printf("E_FIN");
+            break;
+         case E_FIN_ERR:
+            printf("E_FIN_ERR");  
+            break;       
+      }
+   }
    void analyser_lexem(){
-      typedef enum {E_INIT, E_SYMB, E_ENTIER, E_ERR, E_FIN} Etat_Automate ;
       Etat_Automate etat=E_INIT;
 
-      // lexeme_en_cours.chaine[0] = '\0' ;
+      lexeme_en_cours.chaine[0] = '\0' ;
 
-      while(etat != E_FIN){
+      while(etat != E_FIN && etat != E_FIN_ERR){
          
          // on oublie les espaces vide inclus ceux entre des chiffre ex : 12 65 meme chose que 1256
          while (est_separateur(caractere_courant())) {
             avancer_car() ;
          };
 
+         printf("L'etat debut cycle : ");
+         afficher_etat(etat);
+         printf(" -> ");
+
          switch (etat){
 
             case E_INIT:
                switch (nature_caractere(caractere_courant())){      
 
-                  case CHIFFRE:
-                     lexeme_en_cours.nature = ENTIER;
+                  case LETTRE:
+                     lexeme_en_cours.nature = NOMV;
                      lexeme_en_cours.ligne = numero_ligne();
                      lexeme_en_cours.colonne = numero_colonne();
-                     // ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
-                     etat = E_ENTIER;
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     etat = E_INIT;
                      avancer_car();
                      break;
 
                   case C_FIN_SEQUENCE: 
-                     lexeme_en_cours.nature = FIN_SEQUENCE;
-                     etat = E_FIN;
+                     lexeme_en_cours.nature = E_FIN_ERR;
+                     etat = E_FIN_ERR;
                      break ;
 
+                  case AFFC:
+                     lexeme_en_cours.nature = AFF;
+                     lexeme_en_cours.ligne = numero_ligne();
+                     lexeme_en_cours.colonne = numero_colonne();
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     etat = E_AFF;
+                     lexeme_en_cours.chaine[0] = '\0';
+                     avancer_car();
+                     break;
+
                   default:
-                     lexeme_en_cours.nature = ERREUR_CAR;
                      etat = E_ERR;
                      break;
                };
                break;   
-         
+            
+            case E_AFF:
+               switch (nature_caractere(caractere_courant())){
+                   
+                  case LETTRE:
+                     lexeme_en_cours.nature = NOMV;
+                     lexeme_en_cours.ligne = numero_ligne();
+                     lexeme_en_cours.colonne = numero_colonne();
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     etat = E_IDF;
+                     lexeme_en_cours.chaine[0] = '\0';
+                     avancer_car();
+                     break;
+                     
+                  case CHIFFRE:
+                     lexeme_en_cours.nature = ENTIER;
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     lexeme_en_cours.valeur = (lexeme_en_cours.valeur * 10) + (caractere_courant() - '0');
+                     etat = E_ENTIER;
+                     lexeme_en_cours.chaine[0] = '\0';
+                     avancer_car();
+                     break;
+                  
+                  case C_FIN_SEQUENCE: 
+                     lexeme_en_cours.nature = E_FIN_ERR;
+                     etat = E_FIN_ERR;
+                     break ;
+
+                  default:
+                     printf(" Ca se plante ici ");
+                     etat = E_ERR;
+                     break;
+				   };
+               break;
+            
             case E_ENTIER:
                switch (nature_caractere(caractere_courant())){
                   case CHIFFRE:
-                     // ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     lexeme_en_cours.nature = ENTIER;
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     lexeme_en_cours.ligne = numero_ligne();
+                     lexeme_en_cours.colonne = numero_colonne();
                      lexeme_en_cours.valeur = (lexeme_en_cours.valeur * 10) + (caractere_courant() - '0');
                      etat = E_ENTIER;
                      avancer_car();
@@ -349,40 +430,154 @@
                      };
                      lexeme_en_cours.valeur = 0;
                      etat = E_SYMB;
+                     lexeme_en_cours.chaine[0] = '\0';
                      avancer_car();
                      break;
 
-                  case C_FIN_SEQUENCE:
-                     lexeme_en_cours.nature = FIN_SEQUENCE;
-                     lexeme_en_cours.valeur = 0;
+                  case SEPC:
+                     lexeme_en_cours.chaine[0] = '\0';
+                     lexeme_en_cours.nature = SEP;
+                     lexeme_en_cours.ligne = numero_ligne();
+                     lexeme_en_cours.colonne = numero_colonne();
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     etat = E_FIN;
+                     avancer_car();
                      break;
+
+                  case C_FIN_SEQUENCE: 
+                     lexeme_en_cours.nature = E_FIN_ERR;
+                     etat = E_FIN_ERR;
+                     break ;
 
                   default:
                      etat = E_ERR;
-               }
+               };
+               break;
+
+            case E_IDF:
+               switch (nature_caractere(caractere_courant())){      
+
+                  case LETTRE:
+                     lexeme_en_cours.nature = NOMV;
+                     lexeme_en_cours.ligne = numero_ligne();
+                     lexeme_en_cours.colonne = numero_colonne();
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     etat = E_IDF;
+                     avancer_car();
+                     break;
+
+                  case C_FIN_SEQUENCE: 
+                     lexeme_en_cours.nature = E_FIN_ERR;
+                     etat = E_FIN_ERR;
+                     break ;
+
+                  case SYMBOLE:
+                     lexeme_en_cours.chaine[0] = '\0';
+                     switch(caractere_courant()){
+                        case '+':
+                           lexeme_en_cours.nature = PLUS;
+                           break;
+                        case '-':
+                           lexeme_en_cours.nature = MOINS;
+                           break;
+                        case '*':
+                           lexeme_en_cours.nature = MUL;
+                           break;
+                        case '/':
+                           lexeme_en_cours.nature = DIV;
+                           break;
+                        default:
+                           etat = E_ERR;
+                           break;
+                     };
+                     lexeme_en_cours.ligne = numero_ligne();
+                     lexeme_en_cours.colonne = numero_colonne();
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     etat = E_SYMB;
+                     avancer_car();
+                     break;
+
+                  case SEPC:
+                     lexeme_en_cours.chaine[0] = '\0';
+                     lexeme_en_cours.nature = SEP;
+                     lexeme_en_cours.ligne = numero_ligne();
+                     lexeme_en_cours.colonne = numero_colonne();
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     etat = E_FIN;
+                     avancer_car();
+                     break;
+
+                  default:
+                     lexeme_en_cours.nature = ERREUR_CAR;
+                     etat = E_ERR;
+                     break;
+               };
+               break;  
 
             case E_SYMB:
+               lexeme_en_cours.chaine[0] = '\0';
                switch(nature_caractere(caractere_courant())){
                   case CHIFFRE:
                      lexeme_en_cours.nature = ENTIER;
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     lexeme_en_cours.ligne = numero_ligne();
+                     lexeme_en_cours.colonne = numero_colonne();
+                     lexeme_en_cours.valeur = (lexeme_en_cours.valeur * 10) + (caractere_courant() - '0');
                      etat = E_ENTIER;
+                     lexeme_en_cours.chaine[0] = '\0';
+                     avancer_car();
+                     break; 
+
+                  case LETTRE:
+                     lexeme_en_cours.nature = NOMV;
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     lexeme_en_cours.ligne = numero_ligne();
+                     lexeme_en_cours.colonne = numero_colonne();
+                     etat = E_IDF;
+                     avancer_car();
                      break;
 
-                  case C_FIN_SEQUENCE:
-                     lexeme_en_cours.nature = FIN_SEQUENCE;
-                     lexeme_en_cours.valeur = 0;
+                  case C_FIN_SEQUENCE: 
+                     lexeme_en_cours.nature = E_FIN_ERR;
+                     etat = E_FIN_ERR;
+                     break ;
+
+                  default:
+                     etat = E_ERR;
+                     break;
+               };
+               break;
+
+            case E_ERR:
+               switch(nature_caractere(caractere_courant())){
+                  case SEPC:
+                     lexeme_en_cours.nature = SEP;
+                     ajouter_caractere(lexeme_en_cours.chaine, caractere_courant());
+                     lexeme_en_cours.ligne = numero_ligne();
+                     lexeme_en_cours.colonne = numero_colonne();
+                     lexeme_en_cours.chaine[0] = '\0';
+                     etat = E_FIN_ERR;
+                     avancer_car();
                      break;
 
                   default:
                      etat = E_ERR;
                      break;
                };
-            case E_ERR:
                break;
 
             case E_FIN:
+               printf("Fin de l'expression.\n");
                break;
+
+            case E_FIN_ERR:
+               printf("Fin de sequence inattendu\n");
+               exit(0);
          }      
+         
+         printf("L'etat fin cycle : ");
+         afficher_etat(etat);
+         printf("\n");
       }
    }
    /* --------------------------------------------------------------------- */
@@ -390,7 +585,21 @@
    int est_separateur(char c) { 
       return c == ' ' || c == '\t' || c == '\n' ;
    }
-
+/* --------------------------------------------------------------------- */
+   // vaut vrai ssi c designe une lettre
+   int est_lettre(char c){
+      return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+   };
+/* --------------------------------------------------------------------- */
+   // vaut vrai ssi c designe "=", ":=" , "<-"
+   int est_aff(char c){
+      return c == '='; 
+   };
+/* --------------------------------------------------------------------- */
+   // vaut vrai ssi c designe ':'
+   int est_sep(char c){
+      return c == ';';
+   };
 /* --------------------------------------------------------------------- */
    // vaut vrai ssi c designe un entier
    int est_entier(char * str) {
