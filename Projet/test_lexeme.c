@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "analyse_lexicale.h"
+#include "lecture_caracteres.h"
 
 int main (int argc, char *argv[]) {
    if (argc >= 1) {
@@ -16,6 +17,7 @@ int main (int argc, char *argv[]) {
       afficher(lexeme_courant());
       printf("\n"); 
 	   avancer() ;
-   } ;
+   };
+   arreter_car();
    return 0 ;
 }

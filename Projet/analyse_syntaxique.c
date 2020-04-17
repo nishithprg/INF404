@@ -6,6 +6,7 @@
 #include "ast_construction.h"
 #include "ast_parcours.h"
 #include "analyse_lexicale.h"
+#include "table_de_symbole.h"
 
 void rec_eag(Ast *A1){
  	seq_terme(A1);
@@ -78,7 +79,7 @@ void facteur(Ast *A1){
 		  	}
 		  	break;*/
         case IDF: 
-           	*A1 = creer_variable(lexeme_courant().valeur);
+           	*A1 = creer_variable(lexeme_courant().chaine);
 			avancer();
 			break;
 		
@@ -89,7 +90,34 @@ void facteur(Ast *A1){
 }
 
 void affectation(Ast *A1){
+	switch(lexeme_courant().nature){
+		case IDF:
+			*A1 = creer_variable(lexeme_courant().chaine);
+			avancer();
+			switch(lexeme_courant().nature){
+				case AFF:
+					// Ajouter la valeur evalue de chaine prec
+					avancer();
+					rec_eag(A1);
+					evaluation(*A1);
+					switch(lexeme_courant().nature){
+						case SEPAFF:
+							avancer();
+					};
+					break;
+				
+				default:
+					printf("Erreur affectation AFF\n");
+					exit(0);
+			};
+			break;
+		
+		default:
+			printf("Erreur affectation IDF\n");
+			exit(0);
+	}
 	
+
 };
 
 int op1(TypeOperateur *Op){

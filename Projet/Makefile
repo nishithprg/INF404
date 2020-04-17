@@ -14,7 +14,7 @@ analyse_lexicale.o: analyse_lexicale.c analyse_lexicale.h lecture_caracteres.h
 lecture_caracteres.o: lecture_caracteres.c lecture_caracteres.h
 	gcc -g -Wall -c lecture_caracteres.c
 
-test_lexeme.o: analyse_lexicale.h
+test_lexeme.o: analyse_lexicale.h lecture_caracteres.h
 	gcc -g -Wall -c test_lexeme.c
 
 interpreteur.o: interpreteur.c analyse_lexicale.h lecture_caracteres.h

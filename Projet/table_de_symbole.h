@@ -3,7 +3,7 @@
 
 typedef struct element{
     char variable[256];
-    char valeur[];
+    int valeur;
 } Element_table;
 
 typedef struct tableau{
@@ -14,6 +14,8 @@ typedef struct tableau{
 void inserer_tab(Var_DB *tab, char * var, int val);
 
 void afficher_val(Var_DB *tab, int var);
+
+void print_all_table(Var_DB *tab);
 
 #endif
 

@@ -12,4 +12,5 @@ Ast creer_valeur(int val) ;
 // renvoie un arbre abstrait "feuille", de nature OPERATION  
 // et de valeur val
 
+Ast creer_variable(char *var);
 #endif

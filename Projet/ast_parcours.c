@@ -34,7 +34,29 @@ void afficherA(Ast expr) {
 }
 
 int evaluation(Ast expr) {
-      // A COMPLETER !
+	switch(expr->nature){
+		case OPERATION:
+			switch (expr->operateur){
+				case N_PLUS:
+					return evaluation(expr->gauche) + evaluation(expr->droite);
+				case N_MOINS:
+					return evaluation(expr->gauche) - evaluation(expr->droite);
+				
+				case N_MUL:
+					return evaluation(expr->gauche) * evaluation(expr->droite);
+				
+				case N_DIV:
+					return evaluation(expr->gauche) / evaluation(expr->droite);
+				default:
+					exit(1);
+			}
+		
+		case VALEUR:
+			return expr->valeur;
+
+		default:
+			exit(2);
+	}
       return -1 ;
 }
 

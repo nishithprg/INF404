@@ -10,7 +10,7 @@ typedef struct noeud {
 	TypeOperateur operateur ;
 	struct noeud *gauche, *droite ;
     int valeur;
-	char var;
+	char *var;
 } NoeudAst ;
 
 typedef NoeudAst *Ast ;

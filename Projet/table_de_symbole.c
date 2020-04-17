@@ -10,14 +10,14 @@ void inserer_tab(Var_DB *tab, char * var, int val){
     // Modification de val si var sexiste deja
     for(int i = 0; i < tab->buffer_count; i++){
         if(tab->tab_elem[i].variable == var){
-            strcpy(tab->tab_elem[i].variable, val);
+            tab->tab_elem[i].valeur = val;
             return;
         }
     }
     // Insertion de var et val
     tab->buffer_count++;
     strcpy(tab->tab_elem[tab->buffer_count].variable, var);
-    strcpy(tab->tab_elem[tab->buffer_count].valeur, val);
+    tab->tab_elem[tab->buffer_count].valeur = val;
 };
 
 void afficher_val(Var_DB *tab, int var){
@@ -38,6 +38,3 @@ void print_all_table(Var_DB *tab){
     }
 }
 
-int main(){
-
-}

@@ -1,7 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h> 
+#include <string.h>
 
 #include "type_ast.h"
+#include "ast_construction.h"
 
 Ast creer_operation(TypeOperateur opr , Ast opde_gauche , Ast opde_droit) {
       Ast expr ;
@@ -26,10 +28,10 @@ Ast creer_valeur(int val) {
       return expr ;
 }
 
-Ast creer_variable(char var) { 
+Ast creer_variable(char *var) { 
       Ast expr ;
       expr = (Ast) malloc (sizeof(NoeudAst));
       expr->nature = VARIABLE;
-      expr->var = var;
+      strcpy(expr->var, var);
       return expr ;
 }
