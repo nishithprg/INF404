@@ -1,3 +1,5 @@
+#ifndef __ANAL_LEC__
+#define ANAL_LEC__
 /* ------------------------------------------------------------------------
 -- paquetage machine_lexemes
 --
@@ -14,15 +16,15 @@
 	   CHIFFRE,			   // chiffre 
 	   SYMBOLE,          
       LETTRE,           
-      SEPC,
+      SEP,
       AFFC,			      // symbole,
       C_FIN_SEQUENCE    // caractere de fin de sequence     
    } Nature_Caractere ;
 
    typedef enum { 
       ENTIER,           // sequence de chiffres
-      NOMV,           // sequence d'alphabet
-      SEP,              // ;
+      IDF,           // sequence d'alphabet
+      SEPAFF,              // ;
       AFF,              // =
       PLUS,             // +
       MOINS,            // -
@@ -33,13 +35,9 @@
 
    typedef enum {
       E_INIT, 
-      E_AFF, 
       E_ENTIER, 
       E_IDF, 
-      E_SYMB, 
-      E_ERR, 
-      E_FIN, 
-      E_FIN_ERR
+      E_FIN
    } Etat_Automate;
 
    typedef struct { 
@@ -96,3 +94,16 @@
    int est_entier(char * str);
 
    int est_symbol_car(char * str);
+
+   void ajouter_caractere (char *s, char c);
+   Nature_Caractere nature_caractere (char c);
+   int est_separateur(char c);
+   int est_chiffre(char c);
+   int est_symbole(char c);
+   int est_lettre(char c);
+   int est_sep(char c);
+   int est_aff(char c);
+
+   void afficher_etat(Etat_Automate etat);
+
+#endif 

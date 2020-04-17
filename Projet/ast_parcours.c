@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include "type_ast.h"
+#include "ast_parcours.h"
 
 void aff_operateur(TypeOperateur op){
 	switch (op) {
@@ -16,7 +17,7 @@ void aff_operateur(TypeOperateur op){
 	} 
 }
 
-void afficher(Ast expr) {
+void afficherA(Ast expr) {
 	switch (expr->nature) {
                case OPERATION:
                         aff_operateur(expr->operateur) ;

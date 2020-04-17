@@ -3,18 +3,17 @@
 
 #include "type_ast.h"
 
-Ast creer_operation(TypeOperateur opr , Ast opde_gauche , Ast opde_droit) 
-{
+Ast creer_operation(TypeOperateur opr , Ast opde_gauche , Ast opde_droit) {
       Ast expr ;
       expr = (Ast) malloc (sizeof(NoeudAst));
       expr->nature = OPERATION;
       expr->operateur = opr;
       if (opde_gauche == NULL || opde_droit == NULL) {
-         printf("ERREUR_EXPRESSION\n") ;
-	 exit(1) ;
+            printf("ERREUR_EXPRESSION\n") ;
+	      exit(1) ;
       } else {
-         expr->gauche = opde_gauche;
-         expr->droite = opde_droit;
+            expr->gauche = opde_gauche;
+            expr->droite = opde_droit;
       } ;
       return expr ;
 }
@@ -24,5 +23,13 @@ Ast creer_valeur(int val) {
       expr = (Ast) malloc (sizeof(NoeudAst));
       expr->nature = VALEUR;
       expr->valeur = val;
+      return expr ;
+}
+
+Ast creer_variable(char var) { 
+      Ast expr ;
+      expr = (Ast) malloc (sizeof(NoeudAst));
+      expr->nature = VARIABLE;
+      expr->var = var;
       return expr ;
 }

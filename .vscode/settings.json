@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.pdf": "pdf",
+        "*.html": "html",
+        "ast_parcours.h": "c"
+    }
+}
