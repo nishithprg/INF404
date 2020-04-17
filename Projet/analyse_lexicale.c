@@ -325,7 +325,7 @@
             avancer_car() ;
          };
 
-         printf("L'etat debut cycle : ");
+         printf("Caractere courant : %c\tL'etat debut cycle : ", caractere_courant());
          afficher_etat(etat);
          printf(" -> ");
 
@@ -360,6 +360,7 @@
 
                   default:
                      etat = E_ERR;
+                     avancer_car();
                      break;
                };
                break;   
@@ -389,6 +390,7 @@
                   case C_FIN_SEQUENCE: 
                      lexeme_en_cours.nature = E_FIN_ERR;
                      etat = E_FIN_ERR;
+                     avancer_car();
                      break ;
 
                   default:
@@ -447,10 +449,12 @@
                   case C_FIN_SEQUENCE: 
                      lexeme_en_cours.nature = E_FIN_ERR;
                      etat = E_FIN_ERR;
+                     avancer_car();
                      break ;
 
                   default:
                      etat = E_ERR;
+                     avancer_car();
                };
                break;
 
@@ -469,6 +473,7 @@
                   case C_FIN_SEQUENCE: 
                      lexeme_en_cours.nature = E_FIN_ERR;
                      etat = E_FIN_ERR;
+                     avancer_car();
                      break ;
 
                   case SYMBOLE:
@@ -510,6 +515,7 @@
                   default:
                      lexeme_en_cours.nature = ERREUR_CAR;
                      etat = E_ERR;
+                     avancer_car();
                      break;
                };
                break;  
@@ -540,10 +546,12 @@
                   case C_FIN_SEQUENCE: 
                      lexeme_en_cours.nature = E_FIN_ERR;
                      etat = E_FIN_ERR;
+                     avancer_car();
                      break ;
 
                   default:
                      etat = E_ERR;
+                     avancer_car();
                      break;
                };
                break;
@@ -562,6 +570,7 @@
 
                   default:
                      etat = E_ERR;
+                     avancer_car();
                      break;
                };
                break;
@@ -572,7 +581,6 @@
 
             case E_FIN_ERR:
                printf("Fin de sequence inattendu\n");
-               exit(0);
          }      
          
          printf("L'etat fin cycle : ");

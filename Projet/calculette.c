@@ -9,7 +9,7 @@ int main (int argc, char *argv[]) {
         printf("Il faut donner un nom de fichier en argument !") ;
         return 1 ; 
     };
-    while (! fin_de_sequence()){ 
+    while (!fin_de_sequence_car()){ 
 	    analyser_lexem();
     };
     return 0;
