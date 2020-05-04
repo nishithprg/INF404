@@ -1,6 +1,6 @@
 #ifndef __ANAL_LEC__
-#define ANAL_LEC__
-/* ------------------------------------------------------------------------
+#define __ANAL_LEC__
+/* ;------------------------------------------------------------------------
 -- paquetage machine_lexemes
 --
 -- analyse lexicale d'une expression arithmetique

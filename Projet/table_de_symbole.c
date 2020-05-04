@@ -4,36 +4,38 @@
 
 #include "table_de_symbole.h"
 
-Var_DB tab_symb;
+void init_tab(Var_DB *tab){
+    tab->buffer_count = 0;
+};
 
 void inserer_tab(Var_DB *tab, char * var, int val){
     // Modification de val si var sexiste deja
     for(int i = 0; i < tab->buffer_count; i++){
-        if(tab->tab_elem[i].variable == var){
+        if(!strcmp(tab->tab_elem[i].variable, var)){
             tab->tab_elem[i].valeur = val;
             return;
         }
     }
     // Insertion de var et val
-    tab->buffer_count++;
     strcpy(tab->tab_elem[tab->buffer_count].variable, var);
     tab->tab_elem[tab->buffer_count].valeur = val;
+    tab->buffer_count++;
 };
 
-void afficher_val(Var_DB *tab, int var){
-    for(int i = 0; i < tab->buffer_count; i++){
-        if(tab->tab_elem[i].variable == var){
-            printf("%d",tab->tab_elem[i].valeur);
-            break;
+int existe_val(Var_DB tab, char * var){
+    for(int i = 0; i < tab.buffer_count; i++){
+        if(!strcmp(tab.tab_elem[i].variable, var)){
+            return tab.tab_elem[i].valeur;
         }
     }
+    return 0;
 };
 
-void print_all_table(Var_DB *tab){
+void print_all_table(Var_DB tab){
     int i=0;
-    while (i < tab->buffer_count){
-        printf("%c : ",tab->tab_elem[i].variable);
-        printf("%d\n",tab->tab_elem[i].valeur);
+    while (i < tab.buffer_count){
+        printf("%s : ",tab.tab_elem[i].variable);
+        printf("%d\n",tab.tab_elem[i].valeur);
         i++;
     }
 }

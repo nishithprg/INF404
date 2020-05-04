@@ -27,11 +27,3 @@ Ast creer_valeur(int val) {
       expr->valeur = val;
       return expr ;
 }
-
-Ast creer_variable(char *var) { 
-      Ast expr ;
-      expr = (Ast) malloc (sizeof(NoeudAst));
-      expr->nature = VARIABLE;
-      strcpy(expr->var, var);
-      return expr ;
-}
