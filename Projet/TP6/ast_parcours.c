@@ -71,4 +71,23 @@ int evaluation(Ast expr) {
       return -1 ;
 }
 
-
+int eval_condition(Ast A_left, Ast A_right,TypeComparitors op){
+	int opde_gauche = evaluation(A_left);
+	int opde_droite = evaluation(A_right);
+	switch(op){
+	case N_EQL:
+		return opde_gauche == opde_droite;
+	case N_DIFF:
+		return opde_gauche != opde_droite;
+	case N_LE:
+		return opde_gauche <= opde_droite;
+	case N_GE:
+		return opde_gauche >= opde_droite;
+	case N_LT:
+		return opde_gauche < opde_droite;
+	case N_GT:
+		return opde_gauche > opde_droite;
+	default:
+		break;
+	}
+}

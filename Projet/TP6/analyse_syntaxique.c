@@ -68,6 +68,8 @@ void suite_seq_facteur(Ast A1 , Ast *A2,Var_DB *tab_symb){
 }
 	
 void facteur(Ast *A1, Var_DB *tab_symb){
+	afficher(lexeme_courant());
+	printf("\n");
 	switch(lexeme_courant().nature){
 		case ENTIER:
 			*A1 = creer_valeur(lexeme_courant().valeur);
@@ -97,7 +99,6 @@ void facteur(Ast *A1, Var_DB *tab_symb){
 }
 
 void rec_affectation(Ast *A1, Var_DB *tab_symb){
-	print_all_table(*tab_symb);
 	strcpy(nom, lexeme_courant().chaine);
 	printf("Var : %s\n", nom);
 	afficher(lexeme_courant());
@@ -117,14 +118,79 @@ void rec_affectation(Ast *A1, Var_DB *tab_symb){
 			exit(0);
 	};
 	rec_eag(A1,tab_symb);
-	afficherA(*A1);
-	printf("\n");
+	//afficherA(*A1);
 	inserer_tab(tab_symb, nom, evaluation(*A1));
-	afficher(lexeme_courant());
-	printf("\n");
+};
+
+
+int condition(Ast *A_cond, Var_DB *tab_symb){
+	Ast A_left, A_right;
+	rec_eag(&A_left,tab_symb);
+	TypeComparitors op = recon_comparitor(lexeme_courant().nature);
+	rec_eag(&A_right,tab_symb);
+	return eval_condition(A_left,A_right,op);
+}
+
+void inst(Ast *A1, Var_DB *tab_symb){
+	int res_cond;
+	printf("Dans INST.\n");
+	switch(lexeme_courant().nature){
+		Ast A_cond, A_then, A_else;
+		case IF:
+			printf("In IF\n");
+			afficher(lexeme_courant());
+			printf("\n");
+			avancer();
+			res_cond = condition(&A_cond,tab_symb);
+			switch(lexeme_courant().nature){
+			case THEN:
+				printf("In THEN\n");
+				avancer();
+				seq_inst(&A_then,tab_symb);
+				switch(lexeme_courant().nature){
+				case ELSE:
+					printf("In ELSE\n");
+					avancer();
+					seq_inst(&A_else,tab_symb);
+					switch(lexeme_courant().nature){
+					case FI:
+						printf("In FI\n");
+						avancer();
+						// Based on res_cond A1 = A_then or A1 = A_else
+						if(res_cond == 0){
+							*A1 = A_else;
+						} else {
+							*A1 = A_then;
+						}
+						avancer();
+						break;
+					
+					default:
+						printf("Erreur in inst(), missing FI\n");	
+						exit(0);
+					}
+					break;
+				
+				default:
+					printf("Erreur in inst(), missing ELSE\n");	
+					exit(0);
+				}
+				break;
+			
+			default:
+				printf("Erreur in inst(), missing THEN\n");
+				exit(0);
+			}
+		default:
+			rec_affectation(A1,tab_symb);
+	}
+
+}
+
+void suite_seq_inst(Ast *A1, Var_DB *tab_symb){
 	switch(lexeme_courant().nature){
 		case SEPINST:
-			printf("Fin analyse synt d'expression.\n");
+			printf("Fin d'expression.\n");
 			avancer();
 			break;
 
@@ -132,22 +198,22 @@ void rec_affectation(Ast *A1, Var_DB *tab_symb){
 			printf("Erreur affectation SEPINST\n");
 			exit(0);
 	}
-	print_all_table(*tab_symb);
-};
-
-void rec_seq_affectation(Ast *A1, Var_DB *tab_symb){
-	Ast A2;
-	switch(lexeme_courant().nature){
-		case IDF:
-			rec_affectation(A1, tab_symb);
-			printf("**********************New Expression.********************\n");
-			rec_seq_affectation(&A2, tab_symb);
-			break;
-		
-		default:
-			printf("Fin de sequence et fichier.\n");
+	if(fin_de_sequence()){
+		printf("Fin de sequence et fichier.\n");
 	}
-} 
+	Ast A2;
+	seq_inst(&A2,tab_symb);
+}
+
+void seq_inst(Ast *A1, Var_DB *tab_symb){
+	Ast A2;
+	inst(A1,tab_symb);
+	seq_inst(&A2,tab_symb);
+}
+
+void pgm(Ast *A1, Var_DB *tab_symb){
+	seq_inst(A1, tab_symb);
+}
 
 int op1(TypeOperateur *Op){
 	switch(lexeme_courant().nature){
@@ -175,7 +241,21 @@ int op2(TypeOperateur *Op){
 			return 0;
 	}
 }
-		 
+
+TypeComparitors recon_comparitor(Nature_Lexeme nature){
+	switch(nature){
+		case EQL: return N_EQL;
+		case DIFF: return N_DIFF;
+		case LE: return N_LE;
+		case GE: return N_GE;
+		case LT: return N_LT;
+		case GT: return N_GT;
+	default:
+		printf("Erreur OPCOMP dans le IF.\n");
+		exit(0);
+	}
+}
+
 TypeOperateur Operateur(Nature_Lexeme nature){
 	switch(nature){
 		case PLUS : return N_PLUS;
@@ -194,6 +274,7 @@ void analyser(char* nomFichier){
 	Var_DB tab_symb;
 	init_tab(&tab_symb);
 	demarrer(nomFichier) ;
-   	rec_seq_affectation(&A,&tab_symb);
+   	pgm(&A,&tab_symb);
+	print_all_table(tab_symb);
 }	 
  	 

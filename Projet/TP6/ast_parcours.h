@@ -10,6 +10,8 @@ int evaluation(Ast expr) ;
 // calcule la valeur de l'expression arithmetique expr
 // FONCTION A COMPLETER !
 
+int eval_condition(Ast A_left, Ast A_right,TypeComparitors op);
+
 void free_ast(NoeudAst *A);
 
 #endif
